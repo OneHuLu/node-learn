@@ -1,0 +1,16 @@
+node_modules
+
+# env
+config.env
+
+# lock
+yarn.lock
+package-lock.json
+
+# files
+
+dev-data
+
+# md
+
+read.md
