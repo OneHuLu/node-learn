@@ -13,14 +13,18 @@ const singupToken = id => {
   });
 };
 
+const createSendToken = (user, statusCode, res) => {
+  const token = singupToken(user._id);
+  res.status(statusCode).json({
+    status: statusCode,
+    token,
+    data: user
+  });
+};
+
 exports.singup = CatchAsyncError(async (req, res, next) => {
   const newUser = await User.create(req.body);
-  const token = singupToken(newUser._id);
-  res.status(200).json({
-    status: 200,
-    token,
-    data: newUser
-  });
+  createSendToken(newUser, 201, res);
 });
 
 exports.login = CatchAsyncError(async (req, res, next) => {
@@ -34,13 +38,8 @@ exports.login = CatchAsyncError(async (req, res, next) => {
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new Apperror('Incorrect email and password,', 401));
   }
-
   // 3) If everything is ok, send token to clinet
-  const token = singupToken(user._id);
-  res.status(200).json({
-    status: 200,
-    token
-  });
+  createSendToken(user, 200, res);
 });
 
 // Middleware by Check access token
@@ -146,9 +145,20 @@ exports.resetPassword = CatchAsyncError(async (req, res, next) => {
   await user.save();
   // 3) Upadte changePasswordAt property for the user
   // 4) Log the user in , send JWT
-  const token = singupToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token
-  });
+  createSendToken(user, 200, res);
+});
+
+exports.updatePassword = CatchAsyncError(async (req, res, next) => {
+  // 1) Get user for collection
+  const user = await User.findById(req.user.id).select('+password');
+  // 2）Check if current user's password is correct
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new Apperror('Your current password is wrong', 401));
+  }
+  // 3) If so, update password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+  // 4) Log user in , send JWT
+  createSendToken(user, 200, res);
 });
