@@ -16,8 +16,8 @@ router.patch(
   authController.updatePassword
 );
 
-// TODO: Understand why do it
-router.patch('/updateMe', authController.protect, userController.updateMe);
+router.patch('/updateMe', authController.protect, userController.updateMe); // TODO: Understand why do it
+router.delete('/deleteMe', authController.protect, userController.deleteMe);
 
 router
   .route('/')

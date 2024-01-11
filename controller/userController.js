@@ -48,6 +48,13 @@ exports.updateMe = CatchAsyncError(async (req, res, next) => {
   });
 });
 
+exports.deleteMe = CatchAsyncError(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+  res.status(204).send({
+    status: 'success',
+    data: null
+  });
+});
 exports.createUser = (req, res) => {
   res.status(200).json({
     message: 'createUser',
