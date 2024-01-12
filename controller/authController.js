@@ -15,9 +15,20 @@ const singupToken = id => {
 
 const createSendToken = (user, statusCode, res) => {
   const token = singupToken(user._id);
+  // cookie settings
+  const cookieOption = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIES_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true
+  };
+  if (process.env.NODE_ENV === 'production') cookieOption.secure = true;
+  res.cookie('jwt', token, cookieOption);
+  // The password is not shown to the customer
+  user.password = undefined;
+  // retrun data
   res.status(statusCode).json({
     status: statusCode,
-    token,
     data: user
   });
 };
@@ -112,7 +123,6 @@ exports.forgetPassword = CatchAsyncError(async (req, res, next) => {
   } catch (error) {
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
-    console.log(error);
     await user.save({ validateBeforeSave: false });
     return next(
       new Apperror(
