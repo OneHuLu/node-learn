@@ -11,11 +11,7 @@ const userRouter = require('./routes/userRoutes');
 const app = express();
 
 // 1) 中间件 middleware
-app.use((req, res, next) => {
-  console.log("🧰🧰🧰 use middleware: morgan('dev') and express.json() 🧰🧰🧰");
-  next();
-});
-app.use(morgan('dev'));
+if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
 // ip access restrictions
 const limiter = expressRateLimit({
