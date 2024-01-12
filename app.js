@@ -1,5 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
+const expressRateLimit = require('express-rate-limit');
+
 const AppError = require('./utils/appError');
 const globalErrorHandle = require('./controller/errorController');
 
@@ -14,6 +16,15 @@ app.use((req, res, next) => {
   next();
 });
 app.use(morgan('dev'));
+
+// ip access restrictions
+const limiter = expressRateLimit({
+  max: 100,
+  window: 60 * 60 * 1000,
+  message: 'Too many requests from this ip, please try again in one hour.'
+});
+app.use('/api', limiter);
+
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
 app.use((req, res, next) => {
