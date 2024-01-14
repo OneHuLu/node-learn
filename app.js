@@ -11,6 +11,7 @@ const globalErrorHandle = require('./controller/errorController');
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
 
 const app = express();
 
@@ -63,6 +64,7 @@ app.use((req, res, next) => {
 // 2) 路由设置 router settings
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 // 没有找到对应路由的错误捕获
 app.all('*', (req, res, next) => {
