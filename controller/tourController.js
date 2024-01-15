@@ -1,7 +1,6 @@
 const Tour = require('../models/toursModel');
-const APIFeatures = require('../utils/apiFeatures');
-const AppError = require('../utils/appError');
 const { CatchAsyncError } = require('../utils/catchAsync');
+const handleFactory = require('./handleFactory');
 
 exports.aliasTopTours = (req, res, next) => {
   req.query.limit = req.query.limit || '5';
@@ -11,66 +10,15 @@ exports.aliasTopTours = (req, res, next) => {
   next();
 };
 
-exports.getAllTours = CatchAsyncError(async (req, res, next) => {
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  const tours = await features.query;
-  res.status(200).json({
-    status: 200,
-    data: {
-      tours
-    }
-  });
-});
+exports.getAllTours = handleFactory.getAll(Tour);
 
-exports.createTour = CatchAsyncError(async (req, res, next) => {
-  const newToue = await Tour.create(req.body);
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour: newToue
-    }
-  });
-});
+exports.getTour = handleFactory.getOne(Tour, { path: 'reviews' });
 
-exports.getTour = CatchAsyncError(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id).populate('reviews');
-  if (!tour) return next(new AppError('No tour found with that ID', 404));
+exports.createTour = handleFactory.createOne(Tour);
 
-  res.status(200).json({
-    status: 200,
-    data: {
-      tour
-    }
-  });
-});
+exports.updateTour = handleFactory.updateOne(Tour);
 
-exports.updateTour = CatchAsyncError(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true
-  });
-  if (!tour) return next(new AppError('No tour found with that ID', 404));
-
-  res.status(200).json({
-    status: 200,
-    data: {
-      tour
-    }
-  });
-});
-
-exports.deleteTour = CatchAsyncError(async (req, res, next) => {
-  const tour = await Tour.findByIdAndDelete(req.params.id);
-  if (!tour) return next(new AppError('No tour found with that ID', 404));
-  res.status(200).json({
-    status: 200,
-    message: `ok to delete ${req.params.id}`
-  });
-});
+exports.deleteTour = handleFactory.deleteOne(Tour);
 
 // 管道数据聚合
 exports.getTourStats = CatchAsyncError(async (req, res, next) => {

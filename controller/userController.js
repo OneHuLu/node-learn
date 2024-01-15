@@ -1,27 +1,16 @@
 const User = require('../models//userModel');
 const AppError = require('../utils/appError');
-
-// const APIFeatures = require('../utils/apiFeatures');
-
+const handleFactory = require('./handleFactory');
 const { CatchAsyncError } = require('../utils/catchAsync');
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
   Object.keys(obj).map(item => {
     if (allowedFields.includes(item)) newObj[item] = obj[item];
+    return null;
   });
   return newObj;
 };
-
-exports.getAllUsers = CatchAsyncError(async (req, res, next) => {
-  const users = await User.find();
-  res.status(200).json({
-    status: 200,
-    data: {
-      users
-    }
-  });
-});
 
 exports.updateMe = CatchAsyncError(async (req, res, next) => {
   // 1) Create error if user post password data. TODO: I think only do a filter here
@@ -48,6 +37,9 @@ exports.updateMe = CatchAsyncError(async (req, res, next) => {
   });
 });
 
+/**
+ * user logout is soft deleted
+ */
 exports.deleteMe = CatchAsyncError(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, { active: false });
   res.status(204).send({
@@ -55,48 +47,14 @@ exports.deleteMe = CatchAsyncError(async (req, res, next) => {
     data: null
   });
 });
-exports.createUser = (req, res) => {
-  res.status(200).json({
-    message: 'createUser',
-    status: 200
-  });
-};
 
-exports.getUser = (req, res) => {
-  res.status(200).json({
-    message: 'getUser',
-    status: 200
-  });
-};
+/**
+ *  Don't use this function update password
+ */
+exports.updateUser = handleFactory.updateOne(User);
 
-exports.updateUser = (req, res) => {
-  res.status(200).json({
-    message: 'updateUser',
-    status: 200
-  });
-};
+exports.getUser = handleFactory.getOne(User);
 
-exports.deleteUser = (req, res) => {
-  res.status(200).json({
-    message: 'deleteUser',
-    status: 200
-  });
-};
+exports.deleteUser = handleFactory.deleteOne(User);
 
-exports.checkName = (req, res, next) => {
-  if (!req.body.name) {
-    return res.status(403).json({
-      context: 'nameis required'
-    });
-  }
-  next();
-};
-
-exports.checkId = (req, res, next) => {
-  if (!req.body.id) {
-    return res.status(403).json({
-      context: 'id is required'
-    });
-  }
-  next();
-};
+exports.getAllUsers = handleFactory.getAll(User);
