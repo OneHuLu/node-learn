@@ -10,23 +10,16 @@ router.route('/login').post(authController.login);
 router.post('/forgetPassword', authController.forgetPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
-router.patch(
-  '/updatePassword',
-  authController.protect,
-  authController.updatePassword
-);
+// All of the following routes require token validation
+router.use(authController.protect);
+router.patch('/updatePassword', authController.updatePassword);
+router.get('/me', userController.getMe, userController.getUser);
+router.patch('/updateMe', userController.updateMe); // TODO: Understand why do it
+router.delete('/deleteMe', userController.deleteMe);
 
-router.get(
-  '/me',
-  authController.protect,
-  userController.getMe,
-  userController.getUser
-);
-router.patch('/updateMe', authController.protect, userController.updateMe); // TODO: Understand why do it
-router.delete('/deleteMe', authController.protect, userController.deleteMe);
-
-router.route('/').get(authController.protect, userController.getAllUsers);
-
+// All of the following routes only use by admin roles
+router.use(authController.restrictTo('admin'));
+router.route('/').get(userController.getAllUsers);
 router
   .route('/:id')
   .get(userController.getUser)
