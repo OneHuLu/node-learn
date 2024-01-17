@@ -124,6 +124,9 @@ tourSchema.index({
 tourSchema.index({
   slug: 1
 });
+tourSchema.index({
+  startLocation: '2dsphere'
+});
 
 tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7;
@@ -156,16 +159,6 @@ tourSchema.pre(/^find/, function(next) {
   next();
 });
 
-// AGGREGATE MIDDLEWARE 聚合中间件
-tourSchema.pre('aggregate', function(next) {
-  // 对聚合函数处理，添加新的规则
-  this.pipeline().unshift({
-    $match: {
-      secretTour: { $ne: true }
-    }
-  });
-  next();
-});
 const Tour = mongoose.model('Tour', tourSchema);
 
 module.exports = Tour;

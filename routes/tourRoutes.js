@@ -20,6 +20,12 @@ router
     tourController.getMonthlyPlan
   );
 
+router
+  .route('/tours-within/:distance/center/:lating/unit/:unit')
+  .get(tourController.getToursWithin);
+
+router.route('/distances/:lating/unit/:unit').get(tourController.getDistance);
+
 // Nested Routes
 router.use('/:tourId/reviews', reviewRouter);
 
