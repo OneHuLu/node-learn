@@ -29,6 +29,7 @@ const createSendToken = (user, statusCode, res) => {
   // retrun data
   res.status(statusCode).json({
     status: statusCode,
+    token,
     data: user
   });
 };
@@ -84,6 +85,7 @@ exports.protect = CatchAsyncError(async (req, res, next) => {
   next();
 });
 
+// permission function
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
