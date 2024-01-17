@@ -19,7 +19,7 @@ const app = express();
 app.use(helmet());
 
 // 1) 中间件 middleware
-if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
+app.use(morgan('dev'));
 
 // ip access restrictions
 const limiter = expressRateLimit({

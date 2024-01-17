@@ -41,6 +41,17 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+// 这里没有生效！在 Compass 中没有出现
+reviewSchema.index(
+  {
+    tour: 1,
+    user: 1
+  },
+  {
+    unique: true
+  }
+);
+
 reviewSchema.pre(/^find/, function(next) {
   this.populate({
     path: 'user',
