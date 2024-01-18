@@ -29,6 +29,13 @@ const limiter = expressRateLimit({
 });
 app.use('/api', limiter);
 
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, DELETE PATCH');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
+
 // Body parser, reading data from body into req.body
 app.use(express.json());
 
