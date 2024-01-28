@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cors = require('cors');
 
 const AppError = require('./utils/appError');
 const globalErrorHandle = require('./controller/errorController');
@@ -28,12 +29,6 @@ const limiter = expressRateLimit({
   message: 'Too many requests from this ip, please try again in one hour.'
 });
 app.use('/api', limiter);
-
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  next();
-});
 
 // Body parser, reading data from body into req.body
 app.use(express.json());
@@ -66,6 +61,9 @@ app.use((req, res, next) => {
   req.requestTime = new Date().toDateString();
   next();
 });
+
+// 使用 CORS 中间件
+app.use(cors());
 
 // 2) 路由设置 router settings
 app.use('/api/v1/tours', tourRouter);
