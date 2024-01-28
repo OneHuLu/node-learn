@@ -163,3 +163,19 @@ exports.getDistance = CatchAsyncError(async (req, res, next) => {
     data: distances
   });
 });
+
+exports.tourDetailPage = CatchAsyncError(async (req, res, next) => {
+  const tour = await Tour.findOne({ _id: req.params.tourId }).populate({
+    path: 'reviews',
+    fields: 'review rating user'
+  });
+
+  if (!tour) {
+    return next(new AppError('There is no tour with that.', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: tour
+  });
+});

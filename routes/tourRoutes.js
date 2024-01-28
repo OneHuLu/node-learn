@@ -26,6 +26,8 @@ router
 
 router.route('/distances/:lating/unit/:unit').get(tourController.getDistance);
 
+router.route('/tour-detail/:tourId').get(tourController.tourDetailPage);
+
 // Nested Routes
 router.use('/:tourId/reviews', reviewRouter);
 
