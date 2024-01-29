@@ -32,9 +32,14 @@ const createSendToken = (user, statusCode, res) => {
       Date.now() + process.env.JWT_COOKIES_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
-    sameSite: 'None' // 允许跨站点发送 cookie
+    sameSite: 'None', // 允许跨站点发送 cookie
+    secure: true
   };
-  if (process.env.NODE_ENV === 'production') cookieOption.secure = true;
+  // Secure 是 Cookie 的一个属性，
+  // 用于指示浏览器仅在使用 HTTPS 安全连接时才发送该 Cookie。
+  // 如果在 Cookie 中设置了 Secure 属性，
+  // 那么浏览器只会在通过 HTTPS 协议连接时才发送该 Cookie。
+  // if (process.env.NODE_ENV === 'production') cookieOption.secure = true;
   res.cookie('jwt', token, cookieOption);
   // The password is not shown to the customer
   user.password = undefined;
@@ -80,7 +85,9 @@ exports.login = CatchAsyncError(async (req, res, next) => {
 exports.logout = (req, res) => {
   res.cookie('jwt', '', {
     expires: new Date(Date.now() - 10 * 1000),
-    httpOnly: true
+    httpOnly: true,
+    sameSite: 'None', // 允许跨站点发送 cookie
+    secure: true
   });
   res.status(200).json({
     status: 200
