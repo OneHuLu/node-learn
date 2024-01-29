@@ -7,12 +7,23 @@ const User = require('../models/userModel');
 const { CatchAsyncError } = require('../utils/catchAsync');
 const sendEmail = require('../utils/email');
 
+/**
+ * 登陆凭证检验
+ * @param {*} id
+ * @returns
+ */
 const singupToken = id => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN
   });
 };
 
+/**
+ * 创建 token
+ * @param {*} user
+ * @param {*} statusCode
+ * @param {*} res
+ */
 const createSendToken = (user, statusCode, res) => {
   const token = singupToken(user._id);
   // cookie settings
@@ -20,7 +31,8 @@ const createSendToken = (user, statusCode, res) => {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIES_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
-    httpOnly: true
+    httpOnly: true,
+    sameSite: 'None' // 允许跨站点发送 cookie
   };
   if (process.env.NODE_ENV === 'production') cookieOption.secure = true;
   res.cookie('jwt', token, cookieOption);
@@ -34,11 +46,17 @@ const createSendToken = (user, statusCode, res) => {
   });
 };
 
+/**
+ * 注册
+ */
 exports.singup = CatchAsyncError(async (req, res, next) => {
   const newUser = await User.create(req.body);
   createSendToken(newUser, 201, res);
 });
 
+/**
+ * 登录
+ */
 exports.login = CatchAsyncError(async (req, res, next) => {
   const { email, password } = req.body;
   // 1) Check if emali and password exist
@@ -54,7 +72,25 @@ exports.login = CatchAsyncError(async (req, res, next) => {
   createSendToken(user, 200, res);
 });
 
+/**
+ * 退出登录
+ * @param {*} req
+ * @param {*} res
+ */
+exports.logout = (req, res) => {
+  res.cookie('jwt', '', {
+    expires: new Date(Date.now() - 10 * 1000),
+    httpOnly: true
+  });
+  res.status(200).json({
+    status: 200
+  });
+};
+
 // Middleware by Check access token
+/**
+ * 路由保护
+ */
 exports.protect = CatchAsyncError(async (req, res, next) => {
   // 1) Getting token and check of it's there
   const getToken =
@@ -86,6 +122,11 @@ exports.protect = CatchAsyncError(async (req, res, next) => {
 });
 
 // permission function
+/**
+ * 角色检验
+ * @param  {...any} roles
+ * @returns
+ */
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
@@ -96,6 +137,9 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+/**
+ * 忘记密码
+ */
 exports.forgetPassword = CatchAsyncError(async (req, res, next) => {
   // 1) Get user based on POST email
   const user = await User.findOne({ email: req.body.email });
@@ -135,6 +179,9 @@ exports.forgetPassword = CatchAsyncError(async (req, res, next) => {
   }
 });
 
+/**
+ * 重置密码
+ */
 exports.resetPassword = CatchAsyncError(async (req, res, next) => {
   // 1) Get user base on the token
   const hasdedToken = crypto
@@ -160,6 +207,9 @@ exports.resetPassword = CatchAsyncError(async (req, res, next) => {
   createSendToken(user, 200, res);
 });
 
+/**
+ * 更新密码
+ */
 exports.updatePassword = CatchAsyncError(async (req, res, next) => {
   // 1) Get user for collection
   const user = await User.findById(req.user.id).select('+password');

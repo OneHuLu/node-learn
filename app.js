@@ -63,7 +63,12 @@ app.use((req, res, next) => {
 });
 
 // 使用 CORS 中间件
-app.use(cors());
+app.use(
+  cors({
+    origin: ['http://localhost:3000', 'https://127.0.0.1:3000'],
+    credentials: true
+  })
+);
 
 // 2) 路由设置 router settings
 app.use('/api/v1/tours', tourRouter);
