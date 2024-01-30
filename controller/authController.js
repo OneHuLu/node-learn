@@ -71,7 +71,7 @@ exports.login = CatchAsyncError(async (req, res, next) => {
   // 2) Check if user exist && password is correct
   const user = await User.findOne({ email }).select('+password');
   if (!user || !(await user.correctPassword(password, user.password))) {
-    return next(new Apperror('Incorrect email and password,', 401));
+    return next(new Apperror('Incorrect email and password.', 401));
   }
   // 3) If everything is ok, send token to clinet
   createSendToken(user, 200, res);
@@ -100,9 +100,10 @@ exports.logout = (req, res) => {
  */
 exports.protect = CatchAsyncError(async (req, res, next) => {
   // 1) Getting token and check of it's there
-  const getToken =
+  const authorizationToken =
     req.headers.authorization && req.headers.authorization.split(' ')[1];
-
+  const cookieToken = req.headers.cookie && req.headers.cookie.split('=')[1];
+  const getToken = authorizationToken || cookieToken;
   if (!getToken) {
     return next(
       new Apperror('You are not login! Please login to get access', 401)
