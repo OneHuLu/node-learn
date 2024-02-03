@@ -21,6 +21,8 @@ exports.updateTour = handleFactory.updateOne(Tour);
 
 exports.deleteTour = handleFactory.deleteOne(Tour);
 
+exports.searchTour = handleFactory.seachRegExp(Tour);
+
 // 管道数据聚合
 exports.getTourStats = CatchAsyncError(async (req, res, next) => {
   const state = await Tour.aggregate([

@@ -28,6 +28,8 @@ router.route('/distances/:lating/unit/:unit').get(tourController.getDistance);
 
 router.route('/tour-detail/:tourId').get(tourController.tourDetailPage);
 
+router.route('/searchTour').post(tourController.searchTour);
+
 // Nested Routes
 router.use('/:tourId/reviews', reviewRouter);
 

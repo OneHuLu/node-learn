@@ -73,3 +73,38 @@ exports.getAll = Model =>
       data: doc
     });
   });
+
+/**
+ * 查询名称等公用方法，不适用与区间匹配
+ * @param {*} Model
+ * @returns
+ */
+exports.seachRegExp = Model =>
+  CatchAsyncError(async (req, res, next) => {
+    // 将名称字符串转换为正则表达式对象
+    const regExpList = Object.keys(req.body).map(key => {
+      return {
+        [key]: {
+          $regex: new RegExp(req.body[key], 'i')
+        }
+      };
+    });
+
+    const features = new APIFeatures(
+      Model.find({
+        $or: regExpList
+      }),
+      req.query
+    )
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+
+    const doc = await features.query;
+    res.status(200).json({
+      status: 200,
+      length: doc.length,
+      data: doc
+    });
+  });
