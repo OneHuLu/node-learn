@@ -17,6 +17,8 @@ router.patch('/updatePassword', authController.updatePassword);
 router.get('/me', userController.getMe, userController.getUser);
 router.patch('/updateMe', userController.updateMe); // TODO: Understand why do it
 router.delete('/deleteMe', userController.deleteMe);
+// user pohot update
+router.post('/updateUserPhoto', userController.updateUserPhoto);
 
 // All of the following routes only use by admin roles
 router.use(authController.restrictTo('admin'));

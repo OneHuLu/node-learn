@@ -40,6 +40,14 @@ exports.deleteMe = CatchAsyncError(async (req, res, next) => {
   });
 });
 
+exports.updateUserPhoto = CatchAsyncError(async (req, res, next) => {
+  const { photo } = req.body;
+  await User.findByIdAndUpdate(req.user.id, { photo });
+  res.status(200).send({
+    status: 200
+  });
+});
+
 /**
  *  Don't use this function update password
  */
