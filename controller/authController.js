@@ -102,7 +102,8 @@ exports.protect = CatchAsyncError(async (req, res, next) => {
   // 1) Getting token and check of it's there
   const authorizationToken =
     req.headers.authorization && req.headers.authorization.split(' ')[1];
-  const cookieToken = req.headers.cookie && req.headers.cookie.split('=')[1];
+  // 使用 ngrok 后会导致cookie多一个abuse_interstitial=noble-gator-moved.ngrok-free.app;因此用jwt=做分割，在分割 '='
+  const cookieToken = req.headers.cookie && req.headers.cookie.split('jwt=')[1];
   const getToken = authorizationToken || cookieToken;
   if (!getToken) {
     return next(
