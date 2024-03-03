@@ -3,16 +3,17 @@ const OpenAIApi = require('openai');
 //本地开发使用
 const { HttpsProxyAgent } = require('https-proxy-agent');
 
-const httpAgent = new HttpsProxyAgent('http://127.0.0.1:7890');
+const config = { apiKey: process.env.OPENAI_API_KEY };
 
-const config =
-  process.env.NODE_ENV === 'production'
-    ? { apiKey: process.env.OPENAI_API_KEY }
-    : { apiKey: process.env.OPENAI_API_KEY, httpAgent };
+// 开发启用本地代理
+if (process.env.NODE_ENV === 'development') {
+  const httpAgent = new HttpsProxyAgent('http://127.0.0.1:7890');
+  config.httpAgent = httpAgent;
+}
+
 const openai = new OpenAIApi(config);
 
 exports.ask = async (req, res, next) => {
-
   const { content } = req.body;
   const completion = await openai.chat.completions.create({
     messages: [{ role: 'system', content }],
