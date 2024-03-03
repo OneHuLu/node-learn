@@ -1,12 +1,11 @@
 const OpenAIApi = require('openai');
 
-//本地开发使用
-const { HttpsProxyAgent } = require('https-proxy-agent');
-
+// 这个process.env.OPENAI_API_KEY本地可以获取，线上就获取不到。。
 const config = { apiKey: process.env.OPENAI_API_KEY };
 
-// 开发启用本地代理
+// 开发启用本地代理 
 if (process.env.NODE_ENV === 'development') {
+  const { HttpsProxyAgent } = require('https-proxy-agent');
   const httpAgent = new HttpsProxyAgent('http://127.0.0.1:7890');
   config.httpAgent = httpAgent;
 }

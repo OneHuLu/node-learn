@@ -17,6 +17,11 @@ const gptsRouter = require('./routes/gptsRoutes.js');
 
 const app = express();
 
+// 线上代理设置
+if (process.env.NODE_EN === 'production') {
+  app.set('trust proxy', true);
+}
+
 // Set security Http Header
 app.use(helmet());
 
