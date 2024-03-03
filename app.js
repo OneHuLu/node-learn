@@ -13,6 +13,7 @@ const globalErrorHandle = require('./controller/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const gptsRouter = require('./routes/gptsRoutes.js');
 
 const app = express();
 
@@ -74,6 +75,7 @@ app.use(
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/chatgpt', gptsRouter);
 
 // 没有找到对应路由的错误捕获
 app.all('*', (req, res, next) => {
