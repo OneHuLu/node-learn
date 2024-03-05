@@ -29,6 +29,7 @@ exports.ask = async (req, res, next) => {
   });
 
   res.status(200).json({
+    status: 200,
     data: completion.choices[0],
   });
 };
